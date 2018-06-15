@@ -1,0 +1,5 @@
+= S3logsbeat Docs
+
+Welcome to the S3logsbeat documentation.
+
+

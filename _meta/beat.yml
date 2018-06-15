@@ -1,0 +1,7 @@
+################### S3logsbeat Configuration Example #########################
+
+############################# S3logsbeat ######################################
+
+s3logsbeat:
+  # Defines how often an event is sent to the output
+  period: 1s
