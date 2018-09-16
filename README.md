@@ -22,7 +22,8 @@ we use the minimum amount of memory allowed by Lamba (128MB), our cost is (accor
 calculator](https://s3.amazonaws.com/lambda-tools/pricing-calculator.html)): $2 for requests + $20.84 for execution = $22.84 / month.
 
 As S3logsbeat can read until 10 SQS messages per request, we need to perform 1,000,000 request to obtain these 10 million of new S3 objects to SQS. As we read the message and delete it after processing, we need 2,000,000 request,
-which implies an SQS cost of $0.80/month. S3 costs would be: 10,000,000 GETs = $0.4 (as EKS is in the same region, I'm ignoring data transfer cost). The total cost with S3logs beat is: $1.20/month.
+which implies an SQS cost of $0.80/month. S3 costs would be: 10,000,000 GETs = $0.4 (as the instance in which
+S3logsbeat is running in the same region, I'm ignoring data transfer cost). The total cost with S3logs beat is: $1.20/month.
 
 ## Features
 S3logsbeat has the following features:
