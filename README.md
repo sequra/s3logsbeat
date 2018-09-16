@@ -8,6 +8,22 @@ these SQS queues, reads new objects messages (ignoring others), downloads S3 obj
 them into events, and finally publishes to ElasticSearch. If all events are published correctly, SQS message
 is deleted from SQS queue.
 
+## Whys
+
+### Why should I use S3logsbeat if I can use Lambdas?
+Lambdas are perfect when you have a few log entries. However, its price is based on how much time it takes to send
+events to ElasticSearch, if you have many log entries, its price could be eleveted.
+
+As S3logsbeat consumes few resources (~20MB RAM on my tests), it can be installed on your ELK or on a container.
+
+For instance, assume we have 10 million of new S3 objects of ALBs logs per month. Each object takes 1 second
+to be downloaded, parsed, and sent to our ElasticSearch (I'm assuming an average of 100 events per object). If
+we use the minimum amount of memory allowed by Lamba (128MB), our cost is (according to [AWS Lambda pricing
+calculator](https://s3.amazonaws.com/lambda-tools/pricing-calculator.html)): $2 for requests + $20.84 for execution = $22.84 / month.
+
+As S3logsbeat can read until 10 SQS messages per request, we need to perform 1,000,000 request to obtain these 10 million of new S3 objects to SQS. As we read the message and delete it after processing, we need 2,000,000 request,
+which implies an SQS cost of $0.80/month. S3 costs would be: 10,000,000 GETs = $0.4 (as EKS is in the same region, I'm ignoring data transfer cost). The total cost with S3logs beat is: $1.20/month.
+
 ## Features
 S3logsbeat has the following features:
 * Limited workers to poll from SQS and download objects from S3 to avoid exceeding AWS request limits
@@ -19,6 +35,7 @@ S3logsbeat has the following features:
 * Supported S3 log parsers: ALB, CloudFront
 * Extra fields based on S3 key
 * Delayed shutdown based on timout and pending messages to be acked by outputs
+* Limited amount of resources: ~20MB RAM in my tests
 
 However, it has some use cases not supported yet:
 * S3 objects already present on bucket when S3 event notifications is activated are not processed
@@ -112,6 +129,34 @@ First case is the typical one when everything is ok because an SQS message is pr
 
 Second case can happen when we have a lot of S3 objects on pending SQS messages. This case is similar to the one exposed initially when `shutdown_timeout` is not configured. It means, unprocessed S3 objects will be processed when S3logsbeat starts again.
 
+### AWS IAM
+S3logsbeat requires the following IAM permissions:
+* SQS permissions: `sqs:ReceiveMessage` and `sqs:DeleteMessage`.
+* S3 permissions: `s3:GetObject`.
+
+IAM policy:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage"
+      ],
+      "Resource": "arn:aws:sqs:*:123456789012:<QUEUE_NAME>"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::<BUCKET-NAME>/*"
+    }
+  ]
+}
+```
 
 ### Example of events
 
