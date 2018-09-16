@@ -57,7 +57,7 @@ S3logsbeat can avoid duplicates on ElasticSearch output transparently by adding 
 based on its content.
 
 It can also be used on Logstash output because a `@metadata` field called `_id` is added with this information. You
-can configure your (Logstash ES output)[https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html]
+can configure your [Logstash ES output](https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html)
 in the following way to take this value and use it as document identifier:
 ```
 output {
@@ -198,7 +198,7 @@ Events generated from CloudFront logs are in the following form:
 
 These fields corresond to the ones established by AWS on [this page](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.html#LogFileFormat).
 
-## Getting Started with S3logsbeat
+## Development
 
 ### Requirements
 
