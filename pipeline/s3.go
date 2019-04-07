@@ -3,7 +3,7 @@ package pipeline
 import (
 	"fmt"
 
-	"github.com/mpucholblasco/s3logsbeat/aws"
+	"github.com/sequra/s3logsbeat/aws"
 
 	"github.com/elastic/beats/libbeat/common"
 )

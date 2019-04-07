@@ -263,7 +263,7 @@ It will create a clean git history for each major step. Note that you can always
 To push S3logsbeat in the git repository, run the following commands:
 
 ```
-git remote set-url origin https://github.com/mpucholblasco/s3logsbeat
+git remote set-url origin https://github.com/sequra/s3logsbeat
 git push origin master
 ```
 
@@ -336,8 +336,8 @@ make clean
 To clone S3logsbeat from the git repository, run the following commands:
 
 ```
-mkdir -p ${GOPATH}/src/github.com/mpucholblasco/s3logsbeat
-git clone https://github.com/mpucholblasco/s3logsbeat ${GOPATH}/src/github.com/mpucholblasco/s3logsbeat
+mkdir -p ${GOPATH}/src/github.com/sequra/s3logsbeat
+git clone https://github.com/sequra/s3logsbeat ${GOPATH}/src/github.com/sequra/s3logsbeat
 ```
 
 

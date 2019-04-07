@@ -3,7 +3,7 @@ package registrar
 import (
 	"sync"
 
-	"github.com/mpucholblasco/s3logsbeat/pipeline"
+	"github.com/sequra/s3logsbeat/pipeline"
 
 	"github.com/elastic/beats/libbeat/logp"
 )

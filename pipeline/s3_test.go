@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mpucholblasco/s3logsbeat/aws"
+	"github.com/sequra/s3logsbeat/aws"
 
 	"github.com/elastic/beats/libbeat/common"
 )

@@ -4,5 +4,6 @@
 .DS_Store
 /s3logsbeat
 /s3logsbeat.test
+logs/
 *.pyc
 config.yml
