@@ -22,18 +22,22 @@ type Crawler struct {
 	once         bool
 	beatVersion  string
 	beatDone     chan struct{}
-	out          chan *pipeline.SQS
+	outSQS       chan *pipeline.SQS
+	outS3List    chan *pipeline.S3List
+	allowedTypes []string
 }
 
 // New creates a new crawler
-func New(inputConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool, out chan *pipeline.SQS) (*Crawler, error) {
+func New(inputConfigs []*common.Config, beatVersion string, beatDone chan struct{}, once bool, outSQS chan *pipeline.SQS, outS3List chan *pipeline.S3List, allowedTypes []string) (*Crawler, error) {
 	return &Crawler{
 		inputs:       map[uint64]*input.Runner{},
 		inputConfigs: inputConfigs,
 		once:         once,
 		beatVersion:  beatVersion,
 		beatDone:     beatDone,
-		out:          out,
+		outSQS:       outSQS,
+		outS3List:    outS3List,
+		allowedTypes: allowedTypes,
 	}, nil
 }
 
@@ -60,19 +64,24 @@ func (c *Crawler) startInput(
 		return nil
 	}
 
-	p, err := input.New(config, c.beatDone, c.out)
+	p, err := input.New(config, c.beatDone, c.outSQS, c.outS3List)
 	if err != nil {
 		return fmt.Errorf("Error in initing input: %s", err)
 	}
-	p.Once = c.once
 
-	if _, ok := c.inputs[p.ID]; ok {
-		return fmt.Errorf("Input with same ID already exists: %d", p.ID)
+	if c.isTypeAllowed(p.Type()) {
+		p.Once = c.once
+
+		if _, ok := c.inputs[p.ID]; ok {
+			return fmt.Errorf("Input with same ID already exists: %d", p.ID)
+		}
+
+		c.inputs[p.ID] = p
+
+		p.Start()
+	} else {
+		logp.Info("Ignoring not allowed type %s", p.Type())
 	}
-
-	c.inputs[p.ID] = p
-
-	p.Start()
 
 	return nil
 }
@@ -98,4 +107,13 @@ func (c *Crawler) Stop() {
 // WaitForCompletion waits untill all inputs will be stopped
 func (c *Crawler) WaitForCompletion() {
 	c.wg.Wait()
+}
+
+func (c *Crawler) isTypeAllowed(t string) bool {
+	for _, e := range c.allowedTypes {
+		if e == t {
+			return true
+		}
+	}
+	return false
 }

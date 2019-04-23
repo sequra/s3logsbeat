@@ -11,7 +11,7 @@ type eventACKer struct {
 }
 
 type successLogger interface {
-	Published(sqsMessages []*pipeline.SQSMessage)
+	Published(privateElements []pipeline.S3ObjectProcessNotifications)
 }
 
 func newEventACKer(out successLogger) *eventACKer {
@@ -19,13 +19,13 @@ func newEventACKer(out successLogger) *eventACKer {
 }
 
 func (a *eventACKer) ackEvents(data []interface{}) {
-	states := make([]*pipeline.SQSMessage, 0, len(data))
+	states := make([]pipeline.S3ObjectProcessNotifications, 0, len(data))
 	for _, datum := range data {
 		if datum == nil {
 			continue
 		}
 
-		st, ok := datum.(*pipeline.SQSMessage)
+		st, ok := datum.(pipeline.S3ObjectProcessNotifications)
 		if !ok {
 			continue
 		}
